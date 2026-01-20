@@ -28,20 +28,5 @@ class AdminUserChangeForm(UserChangeForm):
             "telegram_id",
             "role",
             "avatar",
-            "is_active",
-            "is_staff",
-            "is_superuser",
+            "is_active"
         )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        role = cleaned_data.get("role")
-
-        if role == User.ROLE_ADMIN:
-            self.instance.is_staff = True
-            self.instance.is_superuser = True
-        else:
-            self.instance.is_staff = False
-            self.instance.is_superuser = False
-        return cleaned_data
