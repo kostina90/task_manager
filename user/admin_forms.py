@@ -3,23 +3,20 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import User
 
 
-class AdminUserCreationForm(UserCreationForm):
+class AdminUserCreationForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("username", "telegram_id", "role")
+        fields = ("username", "telegram_id", "role", "avatar")
 
     def save(self, commit=True):
         user = super().save(commit=False)
 
-        if user.role == User.ROLE_ADMIN:
-            user.is_staff = True
-            user.is_superuser = True
-        else:
-            user.is_staff = False
-            user.is_superuser = False
+        # технический пароль = telegram_id
+        user.set_password(str(user.telegram_id))
 
         if commit:
             user.save()
+
         return user
 
 
@@ -42,10 +39,9 @@ class AdminUserChangeForm(UserChangeForm):
         role = cleaned_data.get("role")
 
         if role == User.ROLE_ADMIN:
-            cleaned_data["is_staff"] = True
-            cleaned_data["is_superuser"] = True
+            self.instance.is_staff = True
+            self.instance.is_superuser = True
         else:
-            cleaned_data["is_staff"] = False
-            cleaned_data["is_superuser"] = False
-
+            self.instance.is_staff = False
+            self.instance.is_superuser = False
         return cleaned_data

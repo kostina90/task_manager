@@ -10,6 +10,8 @@ class UserAdmin(BaseUserAdmin):
     add_form = AdminUserCreationForm
     form = AdminUserChangeForm
 
+    model = User
+
     list_display = ("id", "username", "telegram_id", "role")
     list_display_links = ("id", "username")
     list_filter = ("role",)
