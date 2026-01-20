@@ -89,7 +89,7 @@ class User(AbstractUser):
         verbose_name="Telegram ID"
     )
 
-    avatar = models.ImageField(
+    avatars = models.ImageField(
         upload_to='avatars/',
         verbose_name="Avatar",
         default='avatars/o_litters.png'
