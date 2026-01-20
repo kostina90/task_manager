@@ -11,6 +11,8 @@ class UserManager(BaseUserManager):
             raise ValueError("The username must be set")
         if not telegram_id:
             raise ValueError("The telegram_id must be set")
+        if not password:
+            raise ValueError("The password must be set")
 
         user = self.model(
             username=username,
@@ -18,7 +20,10 @@ class UserManager(BaseUserManager):
             **extra_fields
         )
 
-        user.set_password(password or str(telegram_id))
+        if not password:
+            raise ValueError("Password must be set")
+
+        user.set_password(password)
         user.save(using=self._db)
         return user
 

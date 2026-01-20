@@ -1,4 +1,4 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
 
@@ -9,14 +9,13 @@ from .models import User
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
-        telegram_id = request.POST.get("telegram_id")
+        password = request.POST.get("password")
 
-        if not username or not telegram_id:
-            return HttpResponseBadRequest("Username and Telegram ID are required.")
+        if not username or not password:
+            return HttpResponseBadRequest("Username and password are required.")
 
-        try:
-            user = User.objects.get(username=username, telegram_id=telegram_id)
-        except User.DoesNotExist:
+        user = authenticate(request, username=username, password=password)
+        if user is None:
             return HttpResponseBadRequest("Invalid credentials.")
 
         login(request, user)
