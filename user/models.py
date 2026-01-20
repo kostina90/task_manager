@@ -84,6 +84,7 @@ class User(AbstractUser):
     )
 
     email = None
+    department = models.CharField(max_length=100, blank=True, null=True)
     telegram_id = models.BigIntegerField(
         unique=True,
         verbose_name="Telegram ID"

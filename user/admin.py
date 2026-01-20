@@ -12,17 +12,17 @@ class UserAdmin(BaseUserAdmin):
 
     model = User
 
-    list_display = ("id", "username", "telegram_id", "role")
+    list_display = ("id", "username", "department", "telegram_id", "role")
     list_display_links = ("id", "username")
     list_filter = ("role",)
     exclude = ("is_staff", "is_superuser")
-    search_fields = ("username", "telegram_id")
+    search_fields = ("username", "telegram_id", "department")
     per_page = 10
 
     fieldsets = (
         ("Main info:", {
             "classes": ("wide",),
-            "fields": ("username", "telegram_id", "avatars"),
+            "fields": ("username", "department", "telegram_id", "avatars"),
         }),
         ("Additional info", {
             "classes": ("wide",),
@@ -33,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         ("Main info:", {
             "classes": ("wide",),
-            "fields": ("username", "telegram_id", "avatars"),
+            "fields": ("username", "department", "telegram_id", "avatars"),
         }),
         ("Additional info", {
             "classes": ("wide",),

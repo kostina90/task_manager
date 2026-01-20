@@ -6,7 +6,7 @@ from .models import User
 class RegisterForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("username", "telegram_id", "role")
+        fields = ("username", "department", "telegram_id", "role")
 
     def save(self, commit=True):
         user = super().save(commit=False)

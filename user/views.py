@@ -1,5 +1,5 @@
 from django.contrib.auth import login
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseBadRequest
 
 from .forms import RegisterForm
