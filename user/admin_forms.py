@@ -6,7 +6,7 @@ from .models import User
 class AdminUserCreationForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("username", "telegram_id", "role", "avatar")
+        fields = ("username", "telegram_id", "role", "avatars")
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -27,6 +27,6 @@ class AdminUserChangeForm(UserChangeForm):
             "username",
             "telegram_id",
             "role",
-            "avatar",
+            "avatars",
             "is_active"
         )

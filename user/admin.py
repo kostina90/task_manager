@@ -22,7 +22,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         ("Main info:", {
             "classes": ("wide",),
-            "fields": ("username", "telegram_id", "avatar"),
+            "fields": ("username", "telegram_id", "avatars"),
         }),
         ("Additional info", {
             "classes": ("wide",),
@@ -33,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         ("Main info:", {
             "classes": ("wide",),
-            "fields": ("username", "telegram_id", "avatar"),
+            "fields": ("username", "telegram_id", "avatars"),
         }),
         ("Additional info", {
             "classes": ("wide",),
