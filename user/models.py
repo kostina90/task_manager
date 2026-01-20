@@ -113,5 +113,15 @@ class User(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
 
+    def save(self, *args, **kwargs):
+        if self.role == self.ROLE_ADMIN:
+            self.is_staff = True
+            self.is_superuser = True
+        else:
+            self.is_staff = False
+            self.is_superuser = False
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.username
