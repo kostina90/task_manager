@@ -4,24 +4,66 @@ from django.db import models
 
 
 class UserManager(BaseUserManager):
+    use_in_migrations = True
 
-    def create_from_telegram(self, username: str, telegram_id: int):
+    def _create_user(self, username, telegram_id, password=None, **extra_fields):
         if not username:
             raise ValueError("The username must be set")
         if not telegram_id:
             raise ValueError("The telegram_id must be set")
-        
-        user, created = self.get_or_create(
+
+        user = self.model(
             username=username,
-            defaults={"telegram_id": telegram_id}
+            telegram_id=telegram_id,
+            **extra_fields
         )
 
-        user.telegram_id = telegram_id
-        user.set_password(str(telegram_id))
-        user.save()
-
+        user.set_password(password or str(telegram_id))
+        user.save(using=self._db)
         return user
 
+    def create_user(self, username, telegram_id=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+
+        return self._create_user(
+            username=username,
+            telegram_id=telegram_id,
+            password=password,
+            **extra_fields
+        )
+
+    def create_superuser(self, username, telegram_id=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role", "admin")
+
+        return self._create_user(
+            username=username,
+            telegram_id=telegram_id,
+            password=password,
+            **extra_fields
+        )
+
+    def create_from_telegram(self, username, telegram_id, **extra_fields):
+        """
+        Используется ТОЛЬКО ботом.
+        Создаёт пользователя, если его нет.
+        """
+        user, created = self.get_or_create(
+            username=username,
+            defaults={
+                "telegram_id": telegram_id,
+                **extra_fields,
+            }
+        )
+
+        if not created:
+            return user
+
+        user.set_password(str(telegram_id))
+        user.save(update_fields=["password"])
+        return user
 
 class User(AbstractUser):
 
@@ -41,6 +83,7 @@ class User(AbstractUser):
         default=ROLE_IT,
     )
 
+    email = None
     telegram_id = models.BigIntegerField(
         unique=True,
         verbose_name="Telegram ID"
@@ -61,6 +104,9 @@ class User(AbstractUser):
         return self.role == User.ROLE_DEVELOPER
     
     objects = UserManager()
+
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["telegram_id"]
 
     class Meta:
         ordering = ["username",]
