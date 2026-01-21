@@ -10,7 +10,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ("created_at", "status", "priority")
     search_fields = ("title", "creator__username", "executor__username")
     readonly_fields = ("id", "creator", "is_overdue")
-    per_page = 10
+    list_per_page = 10
 
     fieldsets = (
         ("Main Info:", {
