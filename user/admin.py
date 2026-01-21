@@ -16,7 +16,7 @@ class UserAdmin(BaseUserAdmin):
     list_display_links = ("id", "username")
     list_filter = ("role",)
     exclude = ("is_staff", "is_superuser")
-    search_fields = ("username", "telegram_id", "department")
+    search_fields = ("username", "=telegram_id", "department")
     per_page = 10
 
     fieldsets = (
