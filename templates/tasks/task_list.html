@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Tasks</title>
+    <style>
+        .current-user {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="current-user">
+    {% if user.is_authenticated %}
+        {{ user.username }}
+    {% endif %}
+</div>
+
+<h1>My tasks</h1>
+
+{% if tasks %}
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Deadline</th>
+                <th>Creator</th>
+                <th>Executors</th>
+                <th>Overdue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.get_status_display }}</td>
+                    <td>{{ task.get_priority_display }}</td>
+                    <td>
+                        {% if task.deadline %}
+                            {{ task.deadline }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ task.creator.username }}</td>
+                    <td>
+                        {% for user in task.executor.all %}
+                            {{ user.username }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            —
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if task.is_overdue %}
+                            ❌
+                        {% else %}
+                            ✔️
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No tasks yet.</p>
+{% endif %}
+
+</body>
+</html>
