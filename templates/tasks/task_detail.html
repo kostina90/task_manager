@@ -3,11 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ task.title }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .current-user {
+            text-align: right;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .actions {
+            margin-top: 20px;
+        }
+
+        .actions a {
+            margin-right: 10px;
+        }
+
+        .danger {
+            color: red;
+        }
+    </style>
 </head>
 <body>
 
 <!-- Текущий пользователь -->
-<div style="text-align: right;">
+<div class="current-user">
     Logged in as: <strong>{{ request.user.username }}</strong>
 </div>
 
@@ -46,13 +70,13 @@
 
 <p>
     <strong>Executors:</strong>
-    {% if task.executor.all %}
-        {% for user in task.executor.all %}
-            {{ user.username }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    {% else %}
+    {% for execution in task.executions.all %}
+        {{ execution.executor.username }}
+        ({{ execution.get_status_display }})
+        {% if not forloop.last %}, {% endif %}
+    {% empty %}
         —
-    {% endif %}
+    {% endfor %}
 </p>
 
 <p>
@@ -73,6 +97,36 @@
     <strong>Last updated:</strong>
     {{ task.updated_at }}
 </p>
+
+<hr>
+
+<!-- Действия -->
+<div class="actions">
+    {% if request.user == task.creator %}
+        <a href="{% url 'tasks:task_update' task.pk %}">✏️ Edit</a>
+        <a href="{% url 'tasks:task_delete' task.pk %}" class="danger">🗑 Delete</a>
+        <p>
+            <strong>Executors:</strong>
+        </p>
+
+        <ul>
+            {% for execution in task.executions.all %}
+                <li>
+                    {{ execution.executor.username }}
+                    ({{ execution.get_status_display }})
+
+                    {% if request.user == task.creator %}
+                        — <a href="{% url 'tasks:task_executor_update' execution.pk %}">
+                            ✏️ Edit executor
+                        </a>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>—</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
 
 <hr>
 

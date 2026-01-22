@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.auth import get_user_model
 
-from user.models import User
+
+User = get_user_model()
 
 
 class Task(models.Model):
@@ -9,7 +11,6 @@ class Task(models.Model):
     STATUS_IN_PROGRESS = "in_progress"
     STATUS_REVIEW = "review"
     STATUS_DONE = "done"
-    STATUS_NOT_IMPLEMENTED  = "not_implemented"
     STATUS_CANCELED = "canceled"
 
     TASK_STATUS_CHOICES = (
@@ -17,7 +18,6 @@ class Task(models.Model):
         (STATUS_IN_PROGRESS, "In progress"),
         (STATUS_REVIEW, "Review"),
         (STATUS_DONE, "Done"),
-        (STATUS_NOT_IMPLEMENTED, "Not implemented"),
         (STATUS_CANCELED, "Canceled")
     )
 
@@ -39,7 +39,6 @@ class Task(models.Model):
     deadline = models.DateTimeField(blank=True, null=True)
     priority = models.CharField(max_length=8, choices=PRIORITY_CHOICES, default=MEDIUM_PRIORITY)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")
-    executor = models.ManyToManyField(User, blank=True, related_name="assigned_tasks")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -61,3 +60,35 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"
+    
+
+class TaskExecution(models.Model):
+    STATUS_ASSIGNED = "assigned"
+    STATUS_IN_PROGRESS = "in_progress"
+    STATUS_DONE = "done"
+    STATUS_REJECTED = "rejected"
+
+    EXECUTION_STATUS_CHOICES = (
+        (STATUS_ASSIGNED, "Assigned"),
+        (STATUS_IN_PROGRESS, "In progress"),
+        (STATUS_DONE, "Done"),
+        (STATUS_REJECTED, "Rejected")
+    )
+
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="executions")
+    executor = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=11, choices=EXECUTION_STATUS_CHOICES, default=STATUS_ASSIGNED)
+    comment = models.TextField(max_length=500, blank=True)
+    finished_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task", "executor"],
+                name="unique_task_executor"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.task.title} - {self.executor.username}"
