@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
@@ -84,52 +84,61 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
             "tasks:task_detail",
             kwargs={"pk": self.object.pk}
         )
-    
 
-class TaskExecutionUpdateView(LoginRequiredMixin, UpdateView):
+
+class TaskExecutionCreateView(LoginRequiredMixin, CreateView):
     model = TaskExecution
-    template_name = "tasks/task_executor_update.html"
     fields = ("executor",)
+    template_name = "tasks/task_executor_add.html"
 
-    def get_queryset(self):
-        """
-        Доступ ТОЛЬКО создателю задачи
-        """
-        return TaskExecution.objects.filter(
-            task__creator=self.request.user
-        ).select_related("task", "executor")
+    def dispatch(self, request, *args, **kwargs):
+        self.task = get_object_or_404(
+            Task,
+            pk=kwargs["task_pk"],
+            creator=request.user
+        )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
-        """
-        Убираем создателя задачи из списка исполнителей
-        """
         form = super().get_form(form_class)
 
-        task_creator_id = self.object.task.creator_id
+        # исключаем создателя и уже назначенных исполнителей
+        assigned_ids = self.task.executions.values_list(
+            "executor_id", flat=True
+        )
 
         form.fields["executor"].queryset = User.objects.exclude(
-            id=task_creator_id
+            id__in=[self.task.creator_id, *assigned_ids]
         )
 
         return form
 
     def form_valid(self, form):
-        """
-        Если сменили исполнителя — сбрасываем статус
-        """
-        if form.instance.executor != self.object.executor:
-            form.instance.status = TaskExecution.STATUS_ASSIGNED
-            form.instance.comment = ""
-            form.instance.finished_at = None
-
+        form.instance.task = self.task
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "tasks:task_detail",
+            kwargs={"pk": self.task.pk}
+        )
+
+
+class TaskExecutionDeleteView(LoginRequiredMixin, DeleteView):
+    model = TaskExecution
+    template_name = "tasks/task_executor_delete.html"
+
+    def get_queryset(self):
+        return TaskExecution.objects.filter(
+            task__creator=self.request.user
+        ).select_related("task")
 
     def get_success_url(self):
         return reverse_lazy(
             "tasks:task_detail",
             kwargs={"pk": self.object.task.pk}
         )
-    
+
 
 class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task

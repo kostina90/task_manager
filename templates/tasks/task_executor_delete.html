@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remove executor</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .current-user {
+            text-align: right;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .danger {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="current-user">
+    Logged in as: <strong>{{ request.user.username }}</strong>
+</div>
+
+<h1 class="danger">Remove executor</h1>
+
+<p>
+    Task: <strong>{{ object.task.title }}</strong>
+</p>
+
+<p>
+    Executor: <strong>{{ object.executor.username }}</strong>
+</p>
+
+<hr>
+
+<p class="danger">
+    Are you sure you want to remove this executor from the task?
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="danger">🗑 Remove</button>
+    <a href="{% url 'tasks:task_detail' object.task.pk %}">Cancel</a>
+</form>
+
+</body>
+</html>

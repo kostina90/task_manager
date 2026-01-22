@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add executor</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .current-user {
+            text-align: right;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-box {
+            max-width: 400px;
+        }
+
+        .actions {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Текущий пользователь -->
+<div class="current-user">
+    Logged in as: <strong>{{ request.user.username }}</strong>
+</div>
+
+<h1>Add executor</h1>
+
+<p>
+    Task: <strong>{{ view.task.title }}</strong>
+</p>
+
+<hr>
+
+<div class="form-box">
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <p>
+            {{ form.executor.label_tag }}<br>
+            {{ form.executor }}
+            {{ form.executor.errors }}
+        </p>
+
+        <div class="actions">
+            <button type="submit">➕ Add executor</button>
+            <a href="{% url 'tasks:task_detail' view.task.pk %}">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

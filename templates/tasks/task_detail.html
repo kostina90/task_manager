@@ -111,19 +111,28 @@
 
         <ul>
             {% for execution in task.executions.all %}
-                <li>
-                    {{ execution.executor.username }}
-                    ({{ execution.get_status_display }})
+                {{ execution.executor.username }}
+                ({{ execution.get_status_display }})
 
-                    {% if request.user == task.creator %}
-                        — <a href="{% url 'tasks:task_executor_update' execution.pk %}">
-                            ✏️ Edit executor
-                        </a>
-                    {% endif %}
-                </li>
+                {% if request.user == task.creator %}
+                    <a href="{% url 'tasks:task_executor_delete' execution.pk %}"
+                    class="danger">
+                        ✖
+                    </a>
+                {% endif %}
+
+                {% if not forloop.last %}, {% endif %}
             {% empty %}
-                <li>—</li>
+                —
             {% endfor %}
+
+            {% if request.user == task.creator %}
+                <p>
+                    <a href="{% url 'tasks:task_executor_add' task.pk %}">
+                        ➕ Add executor
+                    </a>
+                </p>
+            {% endif %}
         </ul>
     {% endif %}
 </div>
