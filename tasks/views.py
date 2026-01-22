@@ -15,3 +15,15 @@ class TaskListView(ListView):
         return Task.objects.filter(
             Q(creator=user) | Q(executor=user)
         ).distinct()
+    
+
+class TaskDetailView(DetailView):
+    model = Task
+    template_name = "tasks/task_detail.html"
+    context_object_name = "task"
+
+    def get_queryset(self):
+        user = self.request.user
+        return Task.objects.filter(
+            Q(creator=user) | Q(executor=user)
+        ).distinct()

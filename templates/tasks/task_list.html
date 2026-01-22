@@ -38,7 +38,9 @@
         <tbody>
             {% for task in tasks %}
                 <tr>
-                    <td>{{ task.title }}</td>
+                    <td>
+                        <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
+                    </td>
                     <td>{{ task.get_status_display }}</td>
                     <td>{{ task.get_priority_display }}</td>
                     <td>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ task.title }}</title>
+</head>
+<body>
+
+<!-- Текущий пользователь -->
+<div style="text-align: right;">
+    Logged in as: <strong>{{ request.user.username }}</strong>
+</div>
+
+<h1>{{ task.title }}</h1>
+
+<hr>
+
+<p>
+    <strong>Description:</strong><br>
+    {{ task.description }}
+</p>
+
+<p>
+    <strong>Status:</strong>
+    {{ task.get_status_display }}
+</p>
+
+<p>
+    <strong>Priority:</strong>
+    {{ task.get_priority_display }}
+</p>
+
+<p>
+    <strong>Deadline:</strong>
+    {% if task.deadline %}
+        {{ task.deadline }}
+    {% else %}
+        —
+    {% endif %}
+</p>
+
+<p>
+    <strong>Creator:</strong>
+    {{ task.creator.username }}
+</p>
+
+<p>
+    <strong>Executors:</strong>
+    {% if task.executor.all %}
+        {% for user in task.executor.all %}
+            {{ user.username }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    {% else %}
+        —
+    {% endif %}
+</p>
+
+<p>
+    <strong>Overdue:</strong>
+    {% if task.is_overdue %}
+        ❌ Yes
+    {% else %}
+        ✔️ No
+    {% endif %}
+</p>
+
+<p>
+    <strong>Created at:</strong>
+    {{ task.created_at }}
+</p>
+
+<p>
+    <strong>Last updated:</strong>
+    {{ task.updated_at }}
+</p>
+
+<hr>
+
+<!-- Навигация -->
+<p>
+    <a href="{% url 'tasks:tasks_list' %}">← Back to tasks</a>
+</p>
+
+</body>
+</html>
