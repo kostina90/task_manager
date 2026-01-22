@@ -67,18 +67,6 @@
     <strong>Creator:</strong>
     {{ task.creator.username }}
 </p>
-
-<p>
-    <strong>Executors:</strong>
-    {% for execution in task.executions.all %}
-        {{ execution.executor.username }}
-        ({{ execution.get_status_display }})
-        {% if not forloop.last %}, {% endif %}
-    {% empty %}
-        —
-    {% endfor %}
-</p>
-
 <p>
     <strong>Overdue:</strong>
     {% if task.is_overdue %}
